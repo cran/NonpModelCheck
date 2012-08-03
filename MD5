@@ -1,0 +1,14 @@
+3da7524e126d58794d01f39808ae0ddc *DESCRIPTION
+a7d4b4a45913ffd11fb8814cc9867c9b *NAMESPACE
+f7a7af83dba0e16e8dba058e3d3f3c0b *R/group.npvarselec.R
+9e3f2f9c5b68c804894b6c054cd47683 *R/localpoly.reg.R
+18aeb5f16230af4dbc5ca1941546ddd9 *R/npmodelcheck.R
+dc13899ee2c085d523fa88eb678e9ca9 *R/npvarselec.R
+ba99e207fcc0de80f74d4ab541a6fe52 *R/plot3d.localpoly.reg.R
+737613bf7fffd90250732d0b0f8d2a55 *man/group.npvarselec.Rd
+ccd9e3a0368fa4a41090d99893ab6ae2 *man/localpoly.reg.Rd
+8ca58ed3e812483552d528ac847b3310 *man/npmodelcheck.Rd
+8933ee2cfc2d17a4a33af989be5c9e39 *man/npvarselec.Rd
+4e5de11a4c0ee2f6f659a109555474b2 *man/plot3d.localpoly.reg.Rd
+70b942f605b004edd1a16501d4cbe210 *src/Makevars
+e571cf215b337b9b3c4ccbb0216603eb *src/local_poly_estimator.c

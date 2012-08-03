@@ -1,0 +1,18 @@
+useDynLib(NonpModelCheck, .registration=TRUE)
+export(npmodelcheck,npvarselec,localpoly.reg, group.npvarselec,plot3d.localpoly.reg)
+
+S3method(print, npmodelcheck)
+S3method(npmodelcheck, default)
+S3method(npvarselec, default)
+S3method(localpoly.reg, default)
+S3method(group.npvarselec, default)
+S3method(summary, npmodelcheck)
+S3method(print, summary.npmodelcheck)
+S3method(print, npvarselec)
+S3method(print, localpoly.reg)
+S3method(print, group.npvarselec)
+
+
+
+
+

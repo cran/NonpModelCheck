@@ -1,18 +1,17 @@
 \name{plot3d.localpoly.reg}
 \alias{plot3d.localpoly.reg}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{3d plot from a local polynomial fit
 }
 \description{
 Create a 3d plot from a local polynomial fit of two covariates and a response variable.}
 \usage{
-plot3d.localpoly.reg(X,Y, bandwidth = 0, gridsize = 30, degree.pol = 0,
-   kernel.type = "epanech", gridsurface = 30, xlab=expression(X_1),
-   ylab=expression(X_2), zlab=expression(Y), theta = 30, phi = 30, 
-   expand = 0.5, col = "lightblue", ltheta = 120, shade = 0.75, 
+plot3d.localpoly.reg(X,Y, bandwidth = "CV", gridsize = 30, 
+   degree.pol = 0, kernel.type = "epanech", gridsurface = 30, 
+   xlab=expression(X_1), ylab=expression(X_2), 
+   zlab=expression(Y), theta = 30, phi = 30, expand = 0.5, 
+   col = "lightblue", ltheta = 120, shade = 0.75, 
    ticktype = "detailed", pch = 16,...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{X}{
 n by 2 matrix with observations, rows corresponding to data points and columns correspond to covariates.
@@ -20,7 +19,7 @@ n by 2 matrix with observations, rows corresponding to data points and columns c
   \item{Y}{
 vector of observed responses.}
   \item{bandwidth}{
-bandwidth, vector or matrix. If 0, leave-one-out cross validation with criterion of minimum MSE is performed to select a unique bandwidth that will be used for all dimensions of X; if -1, Generalized Cross Validation is performed to select a unique bandwidth that will be used for all dimensions of X; if -2 leave-one-out cross validation for each covariate; and if -3, GCV for each covariate. It may be a vector for each dimension of the X; or a matrix of bandwidths (not to be confused with bandwidth matrix H), where each row is a vector of size 2, representing a bandwidth that changes with the location of estimation for the grid. See \link{localpoly.reg}.
+bandwidth, vector or matrix. If "CV", leave-one-out cross validation with criterion of minimum MSE is performed to select a unique bandwidth that will be used for all dimensions of X; if "GCV", Generalized Cross Validation is performed to select a unique bandwidth that will be used for all dimensions of X; if "CV2" leave-one-out cross validation for each covariate; and if "GCV2", GCV for each covariate. It may be a vector for each dimension of the X; or a matrix of bandwidths (not to be confused with bandwidth matrix H), where each row is a vector of size 2, representing a bandwidth that changes with the location of estimation for the grid. See \link{localpoly.reg}.
 }
   \item{gridsize}{
 number of possible bandwidths to be searched in cross-validation. If left as \emph{default} 0,  gridsize is taken to be 5+as.integer(100/d^3). If cross-validation is not performed, it is ignored.
@@ -28,7 +27,9 @@ number of possible bandwidths to be searched in cross-validation. If left as \em
   \item{degree.pol}{
 degree of the polynomial to be used in the local fit.}
   \item{kernel.type}{
-kernel type, options are "box", "trun.normal", "gaussian", "epanech", "biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.}
+kernel type, options are "box", "trun.normal", "gaussian", "epanech",\cr 
+"biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.
+}
   \item{gridsurface}{number of points on each axis at which to estimate the local polynomial surface.}
   \item{xlab}{parameter for persp}
   \item{ylab}{parameter for persp}
@@ -56,11 +57,6 @@ kernel type, options are "box", "trun.normal", "gaussian", "epanech", "biweight"
 \author{
 Adriano Zanin Zambom <adriano.zambom@gmail.com>
 }
-%\note{
-%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{localpoly.reg}}
@@ -71,7 +67,8 @@ X[,1] = runif(50,-2,2)
 X[,2] = runif(50,-2,2)
 Y = 4*sin(pi*X[,1]) + X[,2] + rnorm(50)
 
-plot3d.localpoly.reg(X,Y, bandwidth=-2, gridsize = 15, degree.pol = 0, gridsurface=20)	
+plot3d.localpoly.reg(X,Y, bandwidth="CV2", gridsize = 15, 
+degree.pol = 0, gridsurface=20)	
 
 
 }

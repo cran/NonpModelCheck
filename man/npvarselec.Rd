@@ -1,16 +1,14 @@
 \name{npvarselec}
 \alias{npvarselec}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Variable selection for covariates in nonparametric regression
 }
-\description{
-Performs variable selection using hypothesis tests of covariates in high-dimensional one-way ANOVA for a completely nonparametric regression model.
-}
+\description{Performs variable selection using hypothesis tests of covariates in high-dimensional \cr 
+	one-way ANOVA for a completely nonparametric regression model.}
 \usage{
 npvarselec(X, Y, method = "backward", p = 7, degree.pol = 0, 
-    kernel.type = "epanech", bandwidth = 0, gridsize = 10, dim.red = c(1, 10))
+    kernel.type = "epanech", bandwidth = "CV", gridsize = 10, 
+    dim.red = c(1, 10))
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{X}{
 matrix with observations, rows corresponding to data points and columns correspond to covariates.
@@ -20,13 +18,15 @@ vector of observed responses.}
   \item{method}{
 type of algorithm to run variable selection, options are "backward", "forward" and "forward2".}
   \item{p}{
-size of the window Wi. See \link{npmodelcheck} for details.}
+size of the window W_i. See \link{npmodelcheck} for details.}
   \item{degree.pol}{
 degree of the polynomial to be used in the local fit.}
   \item{kernel.type}{
-kernel type, options are "box", "trun.normal", "gaussian", "epanech", "biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.}
+kernel type, options are "box", "trun.normal", "gaussian", "epanech",\cr 
+"biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.
+}
   \item{bandwidth}{
-bandwidth for the local polynomial fit at each step of the elimination (or selection). Options are: 0 for leave-one-out cross validation with criterion of minimum MSE to select a unique bandwidth that will be used for all dimensions; -1 for Generalized Cross Validation to select a unique bandwidth that will be used for all dimensions; -2 for leave-one-out cross validation for each covariate; and -3 for GCV for each covariate. See \link{localpoly.reg}.
+bandwidth for the local polynomial fit at each step of the elimination (or selection). Options are: "CV" for leave-one-out cross validation with criterion of minimum MSE to select a unique bandwidth that will be used for all dimensions; "GCV" for Generalized Cross Validation to select a unique bandwidth that will be used for all dimensions; "CV2" for leave-one-out cross validation for each covariate; and "GCV2" for GCV for each covariate. See \link{localpoly.reg}.
 }
   \item{gridsize}{
 number of possible bandwidths to be searched in cross-validation. \emph{Default} is set to 10. If cross-validation is not performed, it is ignored.
@@ -55,11 +55,6 @@ Benjamini, Y. and Yekutieli, D. (2001) The control of false discovery rate in mu
 \author{
 Adriano Zanin Zambom <adriano.zambom@gmail.com>
 }
-%\note{
-%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{npmodelcheck},   \link{localpoly.reg},   \link{group.npvarselec}}
@@ -73,7 +68,7 @@ for (i in 1:d)
 Y = X[,3]^3 + X[,6]^2 + sin(1/2*pi*X[,9]) + rnorm(90)
 
 npvarselec(X, Y, method = "forward", p = 9, degree.pol = 0, 
-kernel.type = "trun.normal", bandwidth = 0)
+kernel.type = "trun.normal", bandwidth = "CV")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

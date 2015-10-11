@@ -1,10 +1,10 @@
 #### Author: Adriano Zanin Zambom
 #### contact: adriano.zambom@gmail.com
-#### last modified: 21/Set/2012
+#### last modified: 2/Oct/2015
 ####
 #### papers of reference: 
-#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
-#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. arXiv 1205.6843.
+#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837.
+#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51.
 
 
 ##########################################################################################################################
@@ -12,7 +12,7 @@
 #
 ##########################################################################################################################
 
-group.npvarselec <- function(X, Y, groups, method = "backward", p = 7,  fitSPC = TRUE, degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 10, dim.red = c(1,10)) UseMethod("group.npvarselec")
+group.npvarselec <- function(X, Y, groups, method = "backward", p = 7,  fitSPC = TRUE, degree.pol = 0, kernel.type = "epanech", bandwidth = "CV", gridsize = 10, dim.red = c(1,10)) UseMethod("group.npvarselec")
 
 
 print.group.npvarselec <- function(x,...)
@@ -54,7 +54,7 @@ print.group.npvarselec <- function(x,...)
 # p = size of the window Wi (number of neighbors to include in the ANOVA cell)
 # degree.pol = the degree of the polynomial to fit the nonparametric regression
 # kernel.type = type of kernel for estimation of m_1
-# bandwidth = 0 for cross validation, -1 for GCV, any other number will be fixed
+# bandwidth = "CV" for cross validation, "GCV" for GCV, "Adp" for adaptive, or any other number/vector will be fixed
 # dim.red: vector where 1st entry indicates 1 for SIR and 2 for SPC. Second entry indicates number of slices (if SIR) or number of components (if SPC)
 #
 # Values Returned:
@@ -63,15 +63,15 @@ print.group.npvarselec <- function(x,...)
 #   test$p_values = of each group
 ##########################################################################################################################
 
-group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, fitSPC = TRUE, degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 10,   dim.red = c(1,10), ...)
+group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, fitSPC = TRUE, degree.pol = 0, kernel.type = "epanech", bandwidth = "CV", gridsize = 10,   dim.red = c(1,10), ...)
 {
     
-   if ((!(method == "backward")) && (!(method == "forward")) && (!(method == "forward2")))
+   if ((!identical(method,"backward")) && (!identical(method,"forward")) && (!identical(method,"forward2")))
       stop("\n\nInvalid method: ",method,"\n\n") else
    if (!is.vector(groups,"list"))
       stop("\n\ngroups must be a vector of type list.\n\n") else
-   if ((bandwidth[1] != 0) && (bandwidth[1] != -1) && (bandwidth[1] != -2) && (bandwidth[1] != -3))
-      stop("\n\nInvalid bandwidth: npvarselec function only takes bandwidth = 0, or -1, or -2, or -3. \n\n") 
+   if ((bandwidth != "CV") && (bandwidth != "GCV") && (bandwidth != "CV2") && (bandwidth != "GCV2"))
+      stop("\n\nInvalid bandwidth: npvarselec function only takes bandwidth = 'CV', or 'GCV', or 'CV2', or 'GCV2'. \n\n")
 
 
    print_iteration <- function(iter, selected) ## just to print nicely on the screen
@@ -121,7 +121,7 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
       }
          
 
-       if (fitSPC == TRUE)   ## need to fit local poly with only 1st SPC of each group
+       if (identical(fitSPC,TRUE))   ## need to fit local poly with only 1st SPC of each group
        {
            X_SPC = matrix(0,n,d)
            for (i in 1:d)                 ## computes the 1st SPC of each group
@@ -147,13 +147,13 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
       cat("-------------------------------------------------------------\n")
       cat("Iter. | Variables in the model\n")
 
-      if (method == "backward")  ##______________________________________ Group Backward Elimination
+      if (identical(method,"backward"))  ##______________________________________ Group Backward Elimination
       {
          selected = seq(1,d)  
       
          iter = 1
          STOP = 0 
-         if (fitSPC == TRUE)   ## need to fit local poly with only 1st SPC of each group
+         if (identical(fitSPC,TRUE))   ## need to fit local poly with only 1st SPC of each group
          {
             while (STOP == 0)  # with 1st SPC
             {
@@ -230,11 +230,8 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
                }
             }
           
-         #selected = selected[ordem]
-         #ANOVA = ANOVA[ordem]
-
       } else
-      if (method == "forward")  ##______________________________________ Group Forward Selection
+      if (identical(method,"forward"))  ##______________________________________ Group Forward Selection
       {
          not_in_model = seq(1,d) 
                     
@@ -255,7 +252,7 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
               
               p_val = 0;
               STOP = 0 
-              if (fitSPC == TRUE)   ## need to fit local poly with only 1st SPC of each group
+              if (identical(fitSPC,TRUE))   ## need to fit local poly with only 1st SPC of each group
               {
                   while (STOP == 0)  # with 1st SPC
                   {
@@ -332,14 +329,10 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
                      }
 
                  }
-              ## here I do the test again to return the right ANOVA
-              #ANOVA = 0                                        ## test all in the model with the new included
-              #for (ind_test in 1:length(selected))
-              #ANOVA[ind_test] = npmodelcheck(cbind(X[,get_quais(groups,selected[ind_test])],X_SPC[,selected[-ind_test]]), Y, seq(1,length(get_quais(groups,selected[ind_test]))), p = p, degree.pol = degree.pol, kernel.type = kernel.type, bandwidth = bandwidth, gridsize = gridsize, dim.red = dim.red)$p_value
           }
 
       } else
-      if (method == "forward2")  ##______________________________________ Group Stepwise Selection
+      if (identical(method,"forward2"))  ##______________________________________ Group Stepwise Selection
       {
          not_in_model = seq(1,d) 
                     
@@ -360,7 +353,7 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
               
               p_val = 0;
               STOP = 0 
-              if (fitSPC == TRUE)   ## need to fit local poly with only 1st SPC of each group
+              if (identical(fitSPC,TRUE))   ## need to fit local poly with only 1st SPC of each group
               {
                   while (STOP == 0)  # with 1st SPC
                   {
@@ -448,7 +441,7 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
 
     # here I do the test again to return the right ANOVA
        ANOVA = 0                                        
-    if (fitSPC == TRUE) 
+    if (identical(fitSPC,TRUE))
        for (ind_test in 1:length(selected))
            ANOVA[ind_test] = npmodelcheck(cbind(X[,get_quais(groups,selected[ind_test])],X_SPC[,selected[-ind_test]]), Y, seq(1,length(get_quais(groups,selected[ind_test]))), p = p, degree.pol = degree.pol, kernel.type = kernel.type, bandwidth = bandwidth, gridsize = gridsize, dim.red = dim.red)$p_value
     else

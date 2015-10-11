@@ -1,6 +1,9 @@
 useDynLib(NonpModelCheck, .registration=TRUE)
 export(npmodelcheck,npvarselec,localpoly.reg, group.npvarselec,plot3d.localpoly.reg)
-
+import(dr)
+importFrom("grDevices", "trans3d")
+importFrom("graphics", "lines", "par", "persp", "plot", "points")
+importFrom("stats", "dist", "pchisq", "pnorm", "princomp", "quantile", "var")
 S3method(print, npmodelcheck)
 S3method(npmodelcheck, default)
 S3method(npvarselec, default)

@@ -1,22 +1,16 @@
-#include <R_ext/Lapack.h>
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <R.h>
 #include <Rmath.h>
 #include <Rdefines.h>
 #include <R_ext/Lapack.h>
+#include <R_ext/BLAS.h>
 
-int n, d;//, length_band;
+int n, d;
 
 double factorial (double x)
 {
-    if (x == 0)
-        return 1;
-    else
-        return (x * factorial(x-1));
+    return(gammafn(x+1));
 } 
 
 
@@ -32,29 +26,31 @@ void reg(const int* m, const int* n,
 
 
 
-double K(char * kernel_type, double ponto)
+double K(int kernel_type, double ponto)
 {
-    if (strcmp(kernel_type,"box") == 0)               // --------------------------------- box
+    if (kernel_type == 1)               // --------------------------------- box
         return(dunif(ponto,-1,1,0));
-    else if (strcmp(kernel_type,"trun.normal") == 0)  // --------------------------------- Truncated Normal
+    else if (kernel_type == 2)  // --------------------------------- Truncated Normal
         return((dnorm(ponto,0,1,0)/(pnorm(-3,0,1,0,0) - pnorm(3,0,1,0,0)))*2*dunif(ponto,-3,3,0));
-    else if (strcmp(kernel_type,"gaussian") == 0)     // --------------------------------- Gaussian
+    else if (kernel_type == 3)     // --------------------------------- Gaussian
         return(dnorm(ponto,0,1,0));
-    else if (strcmp(kernel_type,"epanech") == 0)      // --------------------------------- Epanech
+    else if (kernel_type == 4)      // --------------------------------- Epanech
         return((2*3*dunif(ponto,-1,1,0)*(1-pow(ponto,2))/4));
-    else if (strcmp(kernel_type,"biweight") == 0)     // --------------------------------- biweight (Quartic)
+    else if (kernel_type == 5)     // --------------------------------- biweight (Quartic)
         return((2*15*dunif(ponto,-1,1,0)*pow(1-pow(ponto,2),2)/16));
-    else if (strcmp(kernel_type,"triweight") == 0)    // --------------------------------- triweight
+    else if (kernel_type == 6)    // --------------------------------- triweight
         return((2*35*dunif(ponto,-1,1,0)*pow(1-pow(ponto,2),3)/32));
-    else if (strcmp(kernel_type,"triangular") == 0)   // --------------------------------- triangular
+    else if (kernel_type == 7)   // --------------------------------- triangular
         return((2*dunif(ponto,-1,1,0)*(1-fabs(ponto))));
+    else
+        return 0;
     
 }
 
 
 // generalized cross validation min_{h} nsum[Y - Y_hat(i)_{-i}]^2/(n-tr(H))^2
 // or simple leave-one-out cross-validation
-double GCV( double *X, double *Y, int n, int d, char * kernel_type, double *bands, int grid_size, int degree_pol, int deriv, double *p_bandwidth)   
+void GCV( double *X, double *Y, int n, int d, int kernel_type, double *bands, int grid_size, int degree_pol, int deriv, double *p_bandwidth)
 {
     int i, j, k;
     
@@ -159,7 +155,7 @@ double GCV( double *X, double *Y, int n, int d, char * kernel_type, double *band
 
 // generalized cross validation min_{h} nsum[Y - Y_hat(i)_{-i}]^2/(n-tr(H))^2
 // or simple leave-one-out cross-validation
-void GCV_each_dimens( double *X, double *Y, int n, int d, char * kernel_type, double *bands, int grid_size, int degree_pol, int deriv, double* p_bandwidth)   
+void GCV_each_dimens( double *X, double *Y, int n, int d, int kernel_type, double *bands, int grid_size, int degree_pol, int deriv, double* p_bandwidth)
 {
     int i, j, k;
     
@@ -323,7 +319,7 @@ void GCV_each_dimens( double *X, double *Y, int n, int d, char * kernel_type, do
  MAIN FUNCTION
  ------------------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------------------------ */
-SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SEXP degree_poly, SEXP kernel_type1, SEXP deriv1)   
+SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SEXP degree_poly, SEXP kernel_type1, SEXP deriv1)
 {
     int i, j;
     i = 0;j = 0;
@@ -332,18 +328,14 @@ SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SE
     /* Digest the datastructures (SEXPs) from R */ 
     double *xptr, *yptr, *grid;
     
+    int kernel_type = INTEGER_VALUE(kernel_type1);
     int degree_pol = INTEGER_VALUE(degree_poly);
     int deriv = INTEGER_VALUE(deriv1);
     PROTECT(grid1 = coerceVector (grid1, REALSXP) ) ; 
     grid = REAL(grid1);
     SEXP dimgrid = coerceVector(getAttrib(grid1, R_DimSymbol), INTSXP);
     int n_grid = INTEGER(dimgrid)[1];
-    
-    char *kernel_type;
-    PROTECT(kernel_type1 = AS_CHARACTER(kernel_type1));
-    kernel_type = R_alloc(strlen(CHAR(STRING_ELT(kernel_type1, 0))), sizeof(char)); 
-    strcpy(kernel_type, CHAR(STRING_ELT(kernel_type1, 0)));
-        
+            
     
     // get dimensions of matrix X
     SEXP dimX = coerceVector(getAttrib(X, R_DimSymbol), INTSXP);
@@ -387,10 +379,6 @@ SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SE
     double * banda = REAL(band);
     // banda must have dimensions: n_points by d
     
-    //SEXP dimbanda = coerceVector(getAttrib(band, R_DimSymbol), INTSXP);
-    //int d_banda = INTEGER(dimbanda)[0];
-    //int n_banda = INTEGER(dimbanda)[1];
-
     SEXP bandwidth;
     double *p_bandwidth;
     PROTECT(bandwidth = NEW_NUMERIC(d*n_pontos)); 
@@ -401,9 +389,8 @@ SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SE
     if ((banda[0] == 0) || (banda[0] == -1))
     {
         GCV(xptr, yptr, n , d , kernel_type, grid, n_grid, degree_pol, deriv, p_bandwidth);
-        //for (i = 1; i < d; i++)
-        //    p_bandwidth[i] = p_bandwidth[0];
 
+        
         for (i = 1; i < n_pontos; i++)
             for (j = 0; j < d; j++)
                 p_bandwidth[i*d + j] = p_bandwidth[j];
@@ -514,7 +501,6 @@ SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SE
     // -------------------------------------------------------------------------------------------------- Prediction
     
     
-    
     SEXP list, list_names;
     char *names[2] = {"predicted", "bandwidth"};
     PROTECT(list_names = allocVector(STRSXP,2));    
@@ -525,7 +511,7 @@ SEXP local_poly_estimator(SEXP X, SEXP Y, SEXP points, SEXP band, SEXP grid1, SE
     SET_VECTOR_ELT(list, 1, bandwidth); 
     setAttrib(list, R_NamesSymbol, list_names); 
     
-    UNPROTECT( 10 ) ;
+    UNPROTECT( 9 ) ;
     return(list);
 }
 

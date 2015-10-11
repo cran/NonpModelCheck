@@ -1,10 +1,10 @@
 #### Author: Adriano Zanin Zambom
 #### contact: adriano.zambom@gmail.com
-#### last modified: 21/Set/2012
+#### last modified: 2/Oct/2015
 ####
 #### papers of reference: 
-#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
-#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. arXiv 1205.6843.
+#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837
+#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51
 
  
 ##########################################################################################################################
@@ -12,7 +12,7 @@
 #
 ##########################################################################################################################
 
-npvarselec <- function(X, Y, method = "backward", p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 10, dim.red = c(1,10)) UseMethod("npvarselec")
+npvarselec <- function(X, Y, method = "backward", p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = "CV", gridsize = 10, dim.red = c(1,10)) UseMethod("npvarselec")
 
 
 print.npvarselec <- function(x,...)
@@ -51,8 +51,8 @@ print.npvarselec <- function(x,...)
 # method = backward, forward, forward2
 # p = number of covariate values included in the window W_i, has to be an odd number!
 # degree.pol = the degree of the polynomial to fit the nonparametric regression
-# kernel.type = type of kernel (box, truncated normal) for estimation of m_1
-# bandwidth = 0 for cross validation, -1 for GCV, any other number will be fixed
+# kernel.type = type of kernel (box, truncated normal, etc) for estimation of m_1
+# bandwidth = "CV" for cross validation, "GCV" for GCV, "Adp" for adaptive, or any other number will be fixed
 # dim.red: vector where 1st entry indicates 1 for SIR and 2 for SPC. Second entry indicates number of slices (if SIR) or number of components (if SPC)
 #
 # Values Returned:
@@ -61,12 +61,12 @@ print.npvarselec <- function(x,...)
 #   test$p_values = of each selected covariate 
 ##########################################################################################################################
 
-npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 10,  dim.red = c(1,10), ...)
+npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = "CV", gridsize = 10,  dim.red = c(1,10), ...)
 {
-    if ((!(method == "backward")) && (!(method == "forward")) && (!(method == "forward2")))
+    if ((!identical(method,"backward")) && (!identical(method,"forward")) && (!identical(method,"forward2")))
        stop("\n\nInvalid method: ",method,"\n\n") else
-    if ((bandwidth[1] != 0) && (bandwidth[1] != -1) && (bandwidth[1] != -2) && (bandwidth[1] != -3))
-       stop("\n\nInvalid bandwidth: npvarselec function only takes bandwidth = 0, or -1, or -2, or -3. \n\n") 
+    if ((!identical(bandwidth,"CV")) && (!identical(bandwidth,"GCV")) && (!identical(bandwidth,"CV2")) && (!identical(bandwidth,"GCV2")))
+       stop("\n\nInvalid bandwidth: npvarselec function only takes bandwidth = 'CV', or 'GCV', or 'CV2', or 'GCV2'. \n\n") 
 
 
    print_iteration <- function(iter, not_eliminated) ## just to print nicely on the screen
@@ -100,7 +100,7 @@ npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0,
       cat("-------------------------------------------------------------\n")
       cat("Iter. | Variables in the model\n")
 
-      if (method == "backward")  ##______________________________________ Backward Elimination
+      if (identical(method,"backward"))  ##______________________________________ Backward Elimination
       {
          X_aux = X
          not_eliminated = seq(1,d)  
@@ -117,7 +117,6 @@ npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0,
                ANOVA[ind_test] = npmodelcheck(X_aux, Y, ind_test, p = p, degree.pol = degree.pol, kernel.type = kernel.type, bandwidth = bandwidth, gridsize = gridsize, dim.red = dim.red)$p_value
 
             ordem = order(ANOVA)
-            #ANOVA = ANOVA[ordem]
             benjamini = 0
             for (ben in 1:d)
      	        if (ANOVA[ordem][ben] < ben*0.05/d/(sum(1/seq(1,d))))
@@ -147,7 +146,7 @@ npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0,
          }
          
       } else
-      if (method == "forward")  ##______________________________________ Forward Selection
+      if (identical(method,"forward"))  ##______________________________________ Forward Selection
       {
           not_in_model = seq(1,d) 
           not_eliminated = 0
@@ -206,7 +205,7 @@ npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0,
           
           
       } else
-      if (method == "forward2")  ##______________________________________ "Forward type 2" Selection
+      if (identical(method,"forward2"))  ##______________________________________ "Forward type 2" Selection
       {
         not_in_model = seq(1,d) 
         not_eliminated = 0

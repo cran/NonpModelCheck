@@ -1,10 +1,10 @@
 #### Author: Adriano Zanin Zambom
 #### contact: adriano.zambom@gmail.com
-#### last modified: 21/Set/2012
+#### last modified: 2/Oct/2015
 ####
 #### papers of reference: 
-#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
-#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. arXiv 1205.6843.
+#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837.
+#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51.
 
 
 
@@ -44,7 +44,7 @@ anova_test_univariate <- function(X, Y, p)   # include the edges
 #
 ##########################################################################################################################
 
-npmodelcheck <- function(X, Y, ind_test, p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 30, dim.red = c(1,10)) UseMethod("npmodelcheck")
+npmodelcheck <- function(X, Y, ind_test, p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = "CV", gridsize = 30, dim.red = c(1,10)) UseMethod("npmodelcheck")
 
 
 print.npmodelcheck <- function(x,...)
@@ -53,7 +53,7 @@ print.npmodelcheck <- function(x,...)
     print(x$call)
     cat("\nP-value of the test: ")
     options(digits=22)
-    cat(x$p_value)
+    cat(x$p_value, "\n")
 }
 
 summary.npmodelcheck <- function(object, ...)
@@ -92,20 +92,18 @@ print.summary.npmodelcheck <- function(x, ...)
 # ind_test = index of column of X to be tested 
 # p = number of covariate values included in the window W_i, has to be an odd number!
 # degree.pol = the degree of the polynomial to fit the nonparametric regression
-# kernel.type = type of kernel (box, truncated normal) for estimation of m_1
-# bandwidth = 0, -1, -2, -3, -4, vector or matrix
+# kernel.type = type of kernel (box, truncated normal, etc) for estimation of m_1
+# bandwidth = "CV", "GCV", "CV2", "GCV2", "Adp", number, vector or matrix
 # dim.red: vector where 1st entry indicates 1 for SIR and 2 for SPC. Second entry indicates number of slices (if SIR) or number of components (if SPC)
 #
 # Values Returned:
 # test = list containing the bandwidth used, the predicted Y values and the p-value of the test 
 ##########################################################################################################################
-npmodelcheck.default <- function(X, Y, ind_test, p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 30, dim.red = c(1,10))
+npmodelcheck.default <- function(X, Y, ind_test, p = 7, degree.pol = 0, kernel.type = "epanech", bandwidth = "CV", gridsize = 30, dim.red = c(1,10))
 {
-   if ((length(bandwidth) > 1) && (dim.red[1] != 0))
-      stop(paste("a vector of bandwidths is accepted only when dim.red = 0"))  
    
-   if ((p%%2 == 0) || (p < 2)) stop(paste("p must be an odd number greater or equal to 3"))  
-   if (!is.null(dim(Y))) stop(paste("Y must be a vector")) 
+   if (!is.null(dim(Y))) stop(paste("Y must be a vector"))
+   if ((p%%2 == 0) || (p < 2) || (p >= length(Y)) || (!is.numeric(p))) stop(paste("p must be an odd number greater or equal to 3 and smaller than the number of observations."))
    if (is.null(dim(X)))
    { 
       if (ind_test != 1) stop(paste("enter a valid covariate to be tested")) 
@@ -154,8 +152,8 @@ npmodelcheck.default <- function(X, Y, ind_test, p = 7, degree.pol = 0, kernel.t
       if (dim.red[1] == 2)   ### SPC
       {
          if (length(dim.red) != 2) stop(paste("incorrect input for dim.red! must be a vector with 2 entries")) else  
-         if (dim.red[2] > dim(X_I)[2]) stop(paste("Number of Principal Components must be less than the dimension of X[-ind_test]")) else  
-         if (dim.red[2] == 0) stop(paste("Number of Principal Components must be greater than 0")) else  
+         if (dim.red[2] > dim(X_I)[2]) stop(paste("Number of Principal Components must be less than the dimension of X[-ind_test]")) else
+         if (dim.red[2] <= 0) stop(paste("Number of Principal Components must be greater than 0")) else
          {
             X_I_aux = X_I
             s0 = 0
@@ -174,7 +172,6 @@ npmodelcheck.default <- function(X, Y, ind_test, p = 7, degree.pol = 0, kernel.t
          }
           
       } else stop(paste("first entry of dim.red must be 1 = SIR or 2 = SPC")) 
-
 
 
       if (length(X_I)/n == 0)  ## this is when X[-ind_test] = NULL, that is, test all covariates of X

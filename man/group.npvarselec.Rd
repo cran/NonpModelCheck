@@ -1,17 +1,15 @@
 \name{group.npvarselec}
 \alias{group.npvarselec}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Group variable selection for nonparametric regression
 }
 \description{
 Performs group variable selection in a completely nonparametric regression model using hypothesis testing for high-dimensional one-way ANOVA and False Discovery Rate (FDR) corrections.
 }
 \usage{
-group.npvarselec(X, Y, groups, method = "backward", p = 7, fitSPC = TRUE,
-    degree.pol = 0, kernel.type = "epanech", bandwidth = 0, gridsize = 10, 
-    dim.red = c(1, 10))
+group.npvarselec(X, Y, groups, method = "backward", p = 7, fitSPC 
+    = TRUE, degree.pol = 0, kernel.type = "epanech", bandwidth = 
+    "CV", gridsize = 10, dim.red = c(1, 10))
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{X}{
 matrix with observations, rows corresponding to data points and columns correspond to covariates.
@@ -23,16 +21,19 @@ a variable of type "list" containing, in each item, a vector of indices of the c
   \item{method}{
 type of algorithm to run variable selection, options are "backward", "forward" and "forward2".}
   \item{p}{
-size of the window Wi. See \link{npmodelcheck} for details.}
+size of the window W_i. See \link{npmodelcheck} for details.}
   \item{fitSPC}{
 a logical indicating whether to use the first supervised principal component (SPC) of each group in the local polynomial fitting. See Details.
 }
   \item{degree.pol}{
 degree of the polynomial to be used in the local fit.}
   \item{kernel.type}{
-kernel type, options are "box", "trun.normal", "gaussian", "epanech", "biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.}
+kernel type, options are "box", "trun.normal", "gaussian", "epanech",\cr 
+"biweight", "triweight" and "triangular". "trun.normal" is a gaussian 
+ kernel truncated between -3 and 3.
+}
   \item{bandwidth}{
-bandwidth for the local polynomial fit at each step of the elimination (or selection). Options are: 0 for leave-one-out cross validation with criterion of minimum MSE to select a unique bandwidth that will be used for all dimensions; -1 for Generalized Cross Validation to select a unique bandwidth that will be used for all dimensions; -2 for leave-one-out cross validation for each covariate; and -3 for GCV for each covariate. See \link{localpoly.reg}.
+bandwidth for the local polynomial fit at each step of the elimination (or selection). Options are: "CV" for leave-one-out cross validation with criterion of minimum MSE to select a unique bandwidth that will be used for all dimensions; "GCV" for Generalized Cross Validation to select a unique bandwidth that will be used for all dimensions; "CV2" for leave-one-out cross validation for each covariate; and "GCV2" for GCV for each covariate. See \link{localpoly.reg}.
 }
   \item{gridsize}{
 number of possible bandwidths to be searched in cross-validation. \emph{Default} is set to 10. If cross-validation is not performed, it is ignored.
@@ -58,10 +59,9 @@ See also details of \link{npmodelcheck} and \link{localpoly.reg}.
 \item{p_values}{p-values of the tests of the selected groups}
 }
 \references{
-Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
+Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837.
 
-Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable
-Selection. arXiv 1205.6843.
+Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51.
 
 Benjamini, Y. and Yekutieli, D. (2001) The control of false discovery rate in multiple testing under dependency. Annals of Statistics, 29, 1165-1188.
 
@@ -69,11 +69,6 @@ Benjamini, Y. and Yekutieli, D. (2001) The control of false discovery rate in mu
 \author{
 Adriano Zanin Zambom <adriano.zambom@gmail.com>
 }
-%\note{
-%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{npmodelcheck},   \link{localpoly.reg},   \link{npvarselec}}

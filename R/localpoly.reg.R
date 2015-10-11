@@ -1,6 +1,6 @@
 #### Author: Adriano Zanin Zambom
 #### contact: adriano.zambom@gmail.com
-#### last modified: 21/Set/2012
+#### last modified: 2/Oct/2015
 ####
 #### papers of reference: 
 #### Jianqing Fan and Irene Gijbels (1995). Data-Driven Bandwidth Selection in Local Polynomial Fitting: Variable Bandwidth and Spatial Adaptation. Journal of the Royal Statistical Society. Series B (Methodological), Vol. 57, No. 2, pp. 371-394.
@@ -13,7 +13,7 @@
 # Function: localpoly.reg
 #
 ##########################################################################################################################
-localpoly.reg <- function(X, Y, points = NULL, bandwidth = 0, gridsize = 30, degree.pol = 0, kernel.type = "epanech", deriv = 0) UseMethod("localpoly.reg")
+localpoly.reg <- function(X, Y, points = NULL, bandwidth = "CV", gridsize = 30, degree.pol = 0, kernel.type = "epanech", deriv = 0) UseMethod("localpoly.reg")
 
 
 print.localpoly.reg <- function(x,...)
@@ -32,6 +32,7 @@ print.localpoly.reg <- function(x,...)
     cat(x$bandwidth)
     cat("\n\npredicted: ")
     cat(x$predicted)
+    cat("\n")
 }
 
 
@@ -55,20 +56,26 @@ print.localpoly.reg <- function(x,...)
 #
 # Call: a function in C:local_poly_estimator
 ##########################################################################################################################
-localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = 0, gridsize = 30, degree.pol = 0, kernel.type = "epanech", deriv = 0)    
+localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = "CV", gridsize = 30, degree.pol = 0, kernel.type = "epanech", deriv = 0)    
 {
 
-    if ((!(kernel.type == "box")) && (!(kernel.type == "trun.normal")) && (!(kernel.type == "gaussian")) && (!(kernel.type == "epanech")) && (!(kernel.type == "biweight")) && (!(kernel.type == "triweight")) && (!(kernel.type == "triangular")))
-       stop("\n\nInvalid kernel.type: ",kernel.type,"\n\n") else
+    if ((!identical(kernel.type,"box")) && (!identical(kernel.type,"trun.normal")) && (!identical(kernel.type,"gaussian")) && (!identical(kernel.type,"epanech")) && (!identical(kernel.type,"biweight")) && (!identical(kernel.type,"triweight")) && (!identical(kernel.type,"triangular")))
+       stop("\n\nInvalid kernel.type: ",kernel.type,"\n\n")
     if (!is.null(dim(Y)))
        stop("\n\n Y must be a univariate vector of observations \n\n")
 
-      
-    if (!is.null(dim(X)) && (degree.pol > 2))
+    kernel.type = match(kernel.type,c("box","trun.normal","gaussian","epanech","biweight","triweight","triangular"))
+    ## this will attribute a number to kernel.type corresponding to which string was inputed by the user: 
+    ## "box" = 1, "trun.normal" = 2, etc
+
+    if ((!is.numeric(gridsize)) || (gridsize < 2))
+       stop("\n\nInvalid gridsize: gridsize must be an integer larger than 1.\n\n")
+    
+    if (!is.null(dim(X)) && (degree.pol > 2)) # X is a matrix
        stop("\n\npolynomial regression with degree > 2 available only for univariate X.\n\n") else
-    if (degree.pol < 0) 
+    if ((degree.pol < 0) || (!is.numeric(degree.pol)))
        stop("\n\ninvalid degree of polynomial.\n\n") else
-    if (deriv < 0)
+    if ((deriv < 0) || (!is.numeric(deriv)))
        stop("\n\ninvalid derivative.\n\n")
 
    
@@ -76,47 +83,68 @@ localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = 0, gridsize =
        points = X else
     if (((is.null(dim(X))) && (!is.null(dim(points)))))
        stop("\n\nX has dimension 1, points cannot be of dimension ",dim(points),", procedure stopped.\n\n") else
-    if ((is.null(dim(points))) && ((!is.null(dim(X)))))
+    if ((is.null(dim(points))) && ((!is.null(dim(X))))) # X is a matrix and points is a vector
     {
        if (dim(X)[2] != length(points))
           stop("\n\n 'points' is required to be a matrix or vector with same dimension of X, with ",dim(X)[2]," covariates, procedure stopped.\n\n")
     } else
-    if ((!is.null(dim(points))) && ((!is.null(dim(X)))))
+    if ((!is.null(dim(points))) && ((!is.null(dim(X))))) # X and points are matrices
     {
        if (dim(X)[2] != dim(points)[2])
           stop("\n\n 'points' is required to be a matrix or vector with same dimension of X, with ",dim(X)[2]," covariates, procedure stopped.\n\n") 
     }
 
+   
+    if (is.numeric(bandwidth)) ## bandwidth is a number of a vector of numbers
+    {
+       if (is.null(dim(X)))  ## X is a vector -> bandwidth must be vector or single number
+       {
+          if (length(bandwidth) == 1) ## single number
+          {
+             if (bandwidth <= 0)
+                stop("\n\n Argument bandwidth must be positive. \n\n")
+          } else ## vector
+          if ((length(bandwidth) != length(points)) || (is.matrix(bandwidth)) || (min(bandwidth) <= 0))
+             stop("\n\n An input bandwidth must be a number or positive vector with the same length as 'points'. \n\n")
+       } else ## X is a matrix
+       if ((length(bandwidth) != length(points)) && (dim(X)[2] != length(bandwidth)))
+          stop("\n\n For multivariate X, bandwidth must be a vector of the same dimension of the columns of X, columns of 'points' or rows of 'points'. \n\n")
+    } else # bandwidth is a string
+    if ((!identical(bandwidth,"CV")) && (!identical(bandwidth,"GCV")) && (!identical(bandwidth,"CV2")) && (!identical(bandwidth,"GCV2")) && (!identical(bandwidth,"Adp")))
+       stop("\n\n Invalid bandwidth: ",bandwidth,".\n\n") else
+    {
+        if ((identical(bandwidth,"Adp")) && (!is.null(dim(X))))
+           stop("\n\n Adaptive bandwidth choice is only valid for univariate X.\n\n")
     
-    if (is.null(dim(bandwidth))) ### ifs for bandwidth
-    {
-        if (is.null(dim(X)))
+        if (is.null(dim(X))) # X is a vector
         {
-            if ((length(bandwidth) != 1) && (length(bandwidth) != length(points)))
-               stop("\n\n For univariate X, bandwidth must be 0, -1, -2, -3, -4 a real value or a vector of the same length as 'points' \n\n")
-        } else  ## X is multidim
-            if (length(bandwidth) != dim(X)[2])
-                if ((bandwidth[1] != 0) && (bandwidth[1] != -1) && (bandwidth[1] != -2) && (bandwidth[1] != -3))
-                   stop("\n\n For multivariate X, bandwidth must be 0, -1, -2, -3 or a vector of the same dimension of the columns of X, columns of 'points' or rows of 'points' \n\n")
-    } else ## bandwidth is a matrix 
-    {
-        if (is.null(dim(X)))
-            stop("\n\n For univariate X, bandwidth must be 0, -1, -2, -3, -4 a real value or a vector of the same length as 'points' \n\n") else
-        if ((dim(bandwidth)[2] != dim(X)[2]) || (length(bandwidth) != length(points)))
-           stop("\n\n For multivariate X, bandwidth must be 0, -1, -2, -3 or a vector of the same dimension of the columns of X, columns of 'points' or rows of 'points' \n\n") 
+           if (identical(bandwidth,"CV") || identical(bandwidth,"CV2"))
+              bandwidth = 0 else
+           if (identical(bandwidth,"GCV") || identical(bandwidth,"GCV2"))
+              bandwidth = -1 else
+              bandwidth = -4
+        } else # X is a matrix
+        {
+            if (identical(bandwidth,"CV"))
+               bandwidth = 0 else
+            if (identical(bandwidth,"GCV"))
+               bandwidth = -1 else
+            if (identical(bandwidth,"CV2"))
+               bandwidth = -2 else
+            if (identical(bandwidth,"GCV2"))
+               bandwidth = -3
+        }
         
     }
 
     
-    
-
     ## create matrix of bandwidths:
     ## repeated for each data point of 'points' if matrix 
     ## of bandwidths has not been not specified by user
     banda = bandwidth
-    if ((bandwidth[1] != 0) && (bandwidth[1] != -1) && (bandwidth[1] != -2) && (bandwidth[1] != -3) && (bandwidth[1] != -4))
+    if (bandwidth[1] > 0) # bandwidth is a number of a vector of values
     {
-       if (!is.null(dim(X)))
+       if (!is.null(dim(X))) # X is a matrix
        {
           if (length(points) != dim(X)[2]) ## points is a matrix
           if (length(bandwidth) != length(points))
@@ -125,25 +153,24 @@ localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = 0, gridsize =
              for (i in 1:dim(points)[2])
                 banda[,i] = rep(bandwidth[i],dim(points)[1])
           }
-       } else
+       } else # X is a vector
          if (length(bandwidth) == 1)
             banda = rep(bandwidth,length(points))
-    } else
+    } else # bandwidth is 0, -1, -2, -3, -4
     {
         if (is.null(dim(points)))
             banda = rep(bandwidth[1],length(points)) else
             banda = matrix(bandwidth[1],dim(points)[1],dim(points)[2])
     }
     
+
+
+    
+    
     ## construct grid for cross-validation
     grid = 1  # wont be used
     if ((bandwidth[1] == 0) || (bandwidth[1] == -1) || (bandwidth[1] == -2) || (bandwidth[1] == -3))
-    {
-        #if (gridsize == 0)
-        #  if (is.null(dim(X)))
-        #     gridsize = 5+as.integer(100/(1)^3) else
-        #     gridsize = 5+as.integer(100/(dim(X)[2])^3)
-    
+    {    
        if (is.null(dim(X)))
           grid = seq(quantile(dist(X),.01),max(dist(X))/2,length=gridsize) else
        {
@@ -155,10 +182,7 @@ localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = 0, gridsize =
       
       
     if (bandwidth[1] == -4) # adaptive bandwidth, binned
-    { 
-       if (!is.null(dim(X)))
-        stop("\n\n Adaptive binned bandwidth option (= -4), is only available for univariate X \n\n") else
-       {
+    {
            ordem = order(X) # need to order X to find correct bins
            X = X[ordem]
            Y = Y[ordem]
@@ -166,8 +190,6 @@ localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = 0, gridsize =
            bins = floor(1.5*length(X)/(10*log(length(X))))
            n_bins = floor(length(X)/bins)
            
-           if (gridsize == 0)
-              gridsize = 5+as.integer(100/(1)^3)
            band = 0
            for (i in 1:bins)  ## find band with cross-validation in each bin
            {
@@ -185,7 +207,6 @@ localpoly.reg.default <- function(X, Y, points = NULL, bandwidth = 0, gridsize =
            grid = seq(1,length(X)/2,length=gridsize)
            m1 = .Call("local_poly_estimator",t(seq(1,length(X))), banda, t(seq(1,length(X))), t(rep(0,length=length(X))), t(grid), degree.pol, kernel.type, deriv) 
            banda = m1$predicted
-       }
     }
 
     # in C, a n by d matrix is a vector of size (nd)

@@ -1,16 +1,14 @@
 \name{npmodelcheck}
 \alias{npmodelcheck}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Hypothesis Testing for Covariate or Group effect in Nonparametric Regression 
 }
 \description{
 Tests the significance of a covariate or a group of covariates in a nonparametric regression based on residuals from a local polynomial fit of the remaining covariates using high dimensional one-way ANOVA.
 }
 \usage{
-npmodelcheck(X, Y, ind_test, p = 7, degree.pol = 0, kernel.type = "epanech", 
-    bandwidth = 0, gridsize = 30, dim.red = c(1, 10))
+npmodelcheck(X, Y, ind_test, p = 7, degree.pol = 0, kernel.type =
+ "epanech", bandwidth = "CV", gridsize = 30, dim.red = c(1, 10))
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{X}{
 matrix with observations, rows corresponding to data points and columns correspond to covariates.
@@ -20,13 +18,15 @@ vector of observed responses.}
   \item{ind_test}{
 index or vector with indices of covariates to be tested.}
   \item{p}{
-size of the window Wi. See Details}
+size of the window W_i. See Details.}
   \item{degree.pol}{
 degree of the polynomial to be used in the local fit.}
   \item{kernel.type}{
-kernel type, options are "box", "trun.normal", "gaussian", "epanech", "biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.}
+kernel type, options are "box", "trun.normal", "gaussian", "epanech",\cr 
+"biweight", "triweight" and "triangular". "trun.normal" is a gaussian kernel truncated between -3 and 3.
+}
   \item{bandwidth}{
-bandwidth, vector or matrix of bandwidths for the local polynomial fit. If a vector of bandwidths, it must correspond to each covariate of X_{-(ind_test)}, that is, the covariates not being tested. If 0, leave-one-out cross validation with criterion of minimum MSE is performed to select a unique bandwidth that will be used for all dimensions of X_{-(ind_test)}; if -1, Generalized Cross Validation is performed to select a unique bandwidth that will be used for all dimensions of X_{-(ind_test)}; if -2 leave-one-out cross validation for each covariate of X_{-(ind_test)}; and if -3, GCV for each covariate of X_{-(ind_test)}. It can be a matrix of bandwidths (not to be confused with bandwidth matrix H), where each row is a vector of the same dimension of the columns of X_{-(ind_test)}, representing a bandwidth that changes with the location of estimation for multidimensional X. See \link{localpoly.reg}.
+bandwidth, vector or matrix of bandwidths for the local polynomial fit. If a vector of bandwidths, it must correspond to each covariate of X_{-(ind_test)}, that is, the covariates not being tested. If "CV", leave-one-out cross validation with criterion of minimum MSE is performed to select a unique bandwidth that will be used for all dimensions of X_{-(ind_test)}; if "GCV", Generalized Cross Validation is performed to select a unique bandwidth that will be used for all dimensions of X_{-(ind_test)}; if "CV2" leave-one-out cross validation for each covariate of X_{-(ind_test)}; and if "GCV2", GCV for each covariate of X_{-(ind_test)}. It can be a matrix of bandwidths (not to be confused with bandwidth matrix H), where each row is a vector of the same dimension of the columns of X_{-(ind_test)}, representing a bandwidth that changes with the location of estimation for multidimensional X. See \link{localpoly.reg}.
 }
   \item{gridsize}{
 number of possible bandwidths to be searched in cross-validation. If left as \emph{default} 0,  gridsize is taken to be 5+as.integer(100/d^3). If cross-validation is not performed, it is ignored.
@@ -47,11 +47,9 @@ Dimension reduction (SIR or SPC) is applied on the remaining covariates (X_{-(in
 \item{p-value}{p-value of the test}
 }
 \references{
-Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and
-Variable Selection. arXiv 1205.6761.
+Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837.
 
-Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable
-Selection. arXiv 1205.6843.
+Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51.
 
 Li, K. C. (1991). Sliced Inverse Regression for Dimension Reduction. Journal of the American Statistical Association, 86, 316-327.
 
@@ -60,11 +58,6 @@ Bair E., Hastie T., Paul D. and Tibshirani R. (2006). Prediction by supervised p
 \author{
 Adriano Zanin Zambom <adriano.zambom@gmail.com>
 }
-%\note{
-%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{localpoly.reg},   \link{npvarselec}}
@@ -80,19 +73,19 @@ X[,5] = rnorm(100)
 Y = X[,3]^3 + rnorm(100)
 
 npmodelcheck(X, Y, 2, p = 9, degree.pol = 0, kernel.type = "trun.normal", 
-bandwidth = -1,  dim.red = 0)
+bandwidth = "GCV",  dim.red = 0)
 
 npmodelcheck(X, Y, 3, p = 7, degree.pol = 0, kernel.type = "trun.normal", 
-bandwidth = 0,  dim.red = c(2,2))
+bandwidth = "CV",  dim.red = c(2,2))
 
 npmodelcheck(X, Y, c(1,2), p = 11, degree.pol = 0, kernel.type = "box", 
-bandwidth = 0,  dim.red = c(1,10))
+bandwidth = "CV",  dim.red = c(1,10))
 
 npmodelcheck(X, Y, c(3,4), p = 5, degree.pol = 0, kernel.type = "box", 
-bandwidth = 0,  dim.red = c(1,20))
+bandwidth = "CV",  dim.red = c(1,20))
 
-npmodelcheck(rnorm(100), rnorm(100), 1, p = 5, degree.pol = 1, kernel.type = "box", 
-bandwidth = 0,  dim.red = c(1,20))
+npmodelcheck(rnorm(100), rnorm(100), 1, p = 5, degree.pol = 1, 
+kernel.type = "box", bandwidth = "CV",  dim.red = c(1,20))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

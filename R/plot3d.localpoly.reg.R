@@ -1,14 +1,14 @@
 #### Author: Adriano Zanin Zambom
 #### contact: adriano.zambom@gmail.com
-#### last modified: 21/Set/2012
+#### last modified: 21/Set/2015
 ####
 #### papers of reference: 
-#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
-#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. arXiv 1205.6843.
+#### Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837
+#### Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51
 
  
 
-plot3d.localpoly.reg <- function(X,Y, bandwidth = 0, gridsize = 30, degree.pol = 0, kernel.type = "epanech", gridsurface = 30, xlab=expression(X_1), ylab=expression(X_2), zlab=expression(Y), theta = 30, phi = 30, expand = 0.5, col = "lightblue", 
+plot3d.localpoly.reg <- function(X,Y, bandwidth = "CV", gridsize = 30, degree.pol = 0, kernel.type = "epanech", gridsurface = 30, xlab=expression(X_1), ylab=expression(X_2), zlab=expression(Y), theta = 30, phi = 30, expand = 0.5, col = "lightblue",
 ltheta = 120, shade = 0.75, ticktype = "detailed", pch = 16, ... )
 {
     if (is.null(dim(X)))
@@ -45,7 +45,6 @@ ltheta = 120, shade = 0.75, ticktype = "detailed", pch = 16, ... )
         
         
         op <- par(bg = "white")
-        #persp(W[seq(1,length(W[,1]),by=gridsurface),1],W[1:gridsurface,2], z, xlim = range(X[,1]), ylim = range(X[,2]), zlim = range(Y), xlab=expression(X_1), ylab=expression(X_2), zlab=expression(Y), theta = 30, phi = 30, expand = 0.5, col = "lightblue")
         persp(W[seq(1,length(W[,1]),by=gridsurface),1],W[1:gridsurface,2], z, xlim = range(X[,1]), ylim = range(X[,2]), zlim = range(Y), xlab=xlab, ylab=ylab, zlab=zlab, theta = theta, phi = phi, expand = expand, col = col, 
         ltheta = ltheta, shade = shade, ticktype = ticktype, ...)-> res
         

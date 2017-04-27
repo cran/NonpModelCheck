@@ -54,6 +54,9 @@ Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variabl
 Li, K. C. (1991). Sliced Inverse Regression for Dimension Reduction. Journal of the American Statistical Association, 86, 316-327.
 
 Bair E., Hastie T., Paul D. and Tibshirani R. (2006). Prediction by supervised principal components. Journal of the American Statistical Association, 101, 119-137.
+
+Zambom, A. Z. and Akritas, M. G. (2017) NonpModelCheck: An R Package for Nonparametric Lack-of-Fit Testing and Variable Selection, Journal of Statistical Software, 77(10), 1-28. \cr
+doi:10.18637/jss.v077.i10
 }
 \author{
 Adriano Zanin Zambom <adriano.zambom@gmail.com>

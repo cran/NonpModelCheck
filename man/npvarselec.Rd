@@ -51,6 +51,9 @@ See also details of \link{npmodelcheck}.
 Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
 
 Benjamini, Y. and Yekutieli, D. (2001) The control of false discovery rate in multiple testing under dependency. Annals of Statistics, 29, 1165-1188.
+
+Zambom, A. Z. and Akritas, M. G. (2017) NonpModelCheck: An R Package for Nonparametric Lack-of-Fit Testing and Variable Selection, Journal of Statistical Software, 77(10), 1-28. \cr
+doi:10.18637/jss.v077.i10
 }
 \author{
 Adriano Zanin Zambom <adriano.zambom@gmail.com>

@@ -14,8 +14,3 @@ S3method(print, summary.npmodelcheck)
 S3method(print, npvarselec)
 S3method(print, localpoly.reg)
 S3method(print, group.npvarselec)
-
-
-
-
-

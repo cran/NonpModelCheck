@@ -48,7 +48,7 @@ See also details of \link{npmodelcheck}.
 \item{p_values}{p-values of the tests of the selected covariates}
 }
 \references{
-Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. arXiv 1205.6761.
+Zambom, A. Z. and Akritas, M. G. (2014). a) Nonparametric Lack-of-fit Testing and Consistent Variable Selection. Statistica Sinica, v. 24, pp. 1837-1858.
 
 Benjamini, Y. and Yekutieli, D. (2001) The control of false discovery rate in multiple testing under dependency. Annals of Statistics, 29, 1165-1188.
 
@@ -75,5 +75,3 @@ kernel.type = "trun.normal", bandwidth = "CV")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

@@ -59,14 +59,15 @@ See also details of \link{npmodelcheck} and \link{localpoly.reg}.
 \item{p_values}{p-values of the tests of the selected groups}
 }
 \references{
-Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837.
+Zambom, A. Z. and Akritas, M. G. (2014). a) Nonparametric Lack-of-fit Testing and Consistent Variable Selection. Statistica Sinica, v. 24, pp. 1837-1858.
 
-Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51.
+Zambom, A. Z. and Akritas, M. G. (2015). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51-60.
 
-Benjamini, Y. and Yekutieli, D. (2001) The control of false discovery rate in multiple testing under dependency. Annals of Statistics, 29, 1165-1188.
+Li, K. C. (1991). Sliced Inverse Regression for Dimension Reduction. Journal of the American Statistical Association, 86, 316-327.
 
-Zambom, A. Z. and Akritas, M. G. (2017) NonpModelCheck: An R Package for Nonparametric Lack-of-Fit Testing 
-and Variable Selection, Journal of Statistical Software, 77(10), 1-28. \cr
+Bair E., Hastie T., Paul D. and Tibshirani R. (2006). Prediction by supervised principal components. Journal of the American Statistical Association, 101, 119-137.
+
+Zambom, A. Z. and Akritas, M. G. (2017) NonpModelCheck: An R Package for Nonparametric Lack-of-Fit Testing and Variable Selection, Journal of Statistical Software, 77(10), 1-28. \cr
 doi:10.18637/jss.v077.i10
 }
 \author{
@@ -98,5 +99,3 @@ group.npvarselec(X,Y,groups)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

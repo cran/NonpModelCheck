@@ -84,6 +84,8 @@ npvarselec.default <- function(X, Y, method = "backward", p = 7, degree.pol = 0,
    }
 
 
+   old <- options()         # code line i
+   on.exit(options(old))      # code line i+1
    options(digits=2)
 
    if (is.null(dim(X))) # only 1 covariate

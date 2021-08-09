@@ -52,6 +52,8 @@ print.npmodelcheck <- function(x,...)
     cat("Call:\n")
     print(x$call)
     cat("\nP-value of the test: ")
+    old <- options()         # code line i
+    on.exit(options(old))      # code line i+1
     options(digits=22)
     cat(x$p_value, "\n")
 }
@@ -70,6 +72,8 @@ print.summary.npmodelcheck <- function(x, ...)
 {
     cat("Call:\n")
     print(x$call)
+    old <- options()         # code line i
+    on.exit(options(old))      # code line i+1
     options(digits=22)
     cat("\nbandwidth: ")
     cat(x$b)

@@ -99,7 +99,9 @@ group.npvarselec.default <- function(X, Y, groups, method = "backward", p = 7, f
     }
 
     
-   options(digits=2)
+    old <- options()         # code line i
+    on.exit(options(old))      # code line i+1
+    options(digits=2)
 
    if (is.null(dim(X))) # only 1 covariate
    {

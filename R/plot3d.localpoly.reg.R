@@ -44,7 +44,7 @@ ltheta = 120, shade = 0.75, ticktype = "detailed", pch = 16, ... )
         
         
         
-        op <- par(bg = "white")
+        
         persp(W[seq(1,length(W[,1]),by=gridsurface),1],W[1:gridsurface,2], z, xlim = range(X[,1]), ylim = range(X[,2]), zlim = range(Y), xlab=xlab, ylab=ylab, zlab=zlab, theta = theta, phi = phi, expand = expand, col = col, 
         ltheta = ltheta, shade = shade, ticktype = ticktype, ...)-> res
         

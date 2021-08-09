@@ -47,9 +47,9 @@ Dimension reduction (SIR or SPC) is applied on the remaining covariates (X_{-(in
 \item{p-value}{p-value of the test}
 }
 \references{
-Zambom, A. Z. and Akritas, M. G. (2012). a) Nonparametric Model Checking and Variable Selection. Statistica Sinica, v. 24, pp. 1837.
+Zambom, A. Z. and Akritas, M. G. (2014). a) Nonparametric Lack-of-fit Testing and Consistent Variable Selection. Statistica Sinica, v. 24, pp. 1837-1858.
 
-Zambom, A. Z. and Akritas, M. G. (2012). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51.
+Zambom, A. Z. and Akritas, M. G. (2015). b) Signicance Testing and Group Variable Selection. Journal of Multivariate Analysis, v. 133, pp. 51-60.
 
 Li, K. C. (1991). Sliced Inverse Regression for Dimension Reduction. Journal of the American Statistical Association, 86, 316-327.
 
@@ -92,5 +92,3 @@ kernel.type = "box", bandwidth = "CV",  dim.red = c(1,20))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

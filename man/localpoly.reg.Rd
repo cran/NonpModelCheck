@@ -62,17 +62,17 @@ X = rnorm(100)
 Y = X^3 + rnorm(100)
 
 localpoly.reg(X, Y, degree.pol = 0, kernel.type = "box",
- bandwidth = "CV")
+ bandwidth = 1)
 localpoly.reg(X, Y, degree.pol = 1, kernel.type = "box",
- bandwidth = "CV")
+ bandwidth = 1.4)
 ##--
 X = runif(100,-3,3)
 Y = sin(1/2*pi*X) + rnorm(100,0,.5)
 
 localpoly.reg(X, Y, degree.pol = 0, kernel.type = "gaussian",
-  bandwidth = "CV")
+  bandwidth = 0.2)
 localpoly.reg(X, Y, degree.pol = 1, kernel.type = "gaussian", 
-  bandwidth = "CV")
+  bandwidth = 0.3)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

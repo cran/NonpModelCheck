@@ -70,8 +70,25 @@ for (i in 1:d)
    X[,i] = rnorm(90)
 Y = X[,3]^3 + X[,6]^2 + sin(1/2*pi*X[,9]) + rnorm(90)
 
-npvarselec(X, Y, method = "forward", p = 9, degree.pol = 0, 
-kernel.type = "trun.normal", bandwidth = "CV")
+#npvarselec(X, Y, method = "forward", p = 9, degree.pol = 0, 
+#kernel.type = "trun.normal", bandwidth = "CV")
+#-------------------------------------------------------------
+#Iter. | Variables in the model
+#1     | 3
+#2     | 3 9
+#3     | 3 9 6
+#-------------------------------------------------------------
+#
+#
+#Number of Covariates Selected: 3
+#
+#Covariate(s) Selected: 
+#---------------------------
+#Covariate Index  |  p-value
+#          3      |  0 
+#          9      |  7e-14 
+#          6      |  0 
+#---------------------------
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

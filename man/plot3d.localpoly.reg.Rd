@@ -67,7 +67,7 @@ X[,1] = runif(50,-2,2)
 X[,2] = runif(50,-2,2)
 Y = 4*sin(pi*X[,1]) + X[,2] + rnorm(50)
 
-plot3d.localpoly.reg(X,Y, bandwidth="CV2", gridsize = 15, 
+plot3d.localpoly.reg(X,Y, bandwidth= c(0.44, 1.84), gridsize = 15, 
 degree.pol = 0, gridsurface=20)	
 
 
